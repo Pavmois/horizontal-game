@@ -27,6 +27,5 @@ body {
   text-align: center;
   color: aliceblue;
   margin-top: 60px;
-  border: 1px solid red;
 }
 </style>

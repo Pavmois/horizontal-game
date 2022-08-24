@@ -6,13 +6,13 @@
       <div class='selector'></div>
       <div class='wheel'>
         <div class="row">
-          <div class="card" v-for="item in base" :key="item.id">{{item}}</div>
+          <div class="card" v-for="item in roulette_items" :key="item.id">{{item}}</div>
         </div>
       </div>
     </div>
 
     <div>
-      <input type="number" v-model="inputValue" placeholder='Введи от 1 до 10' id="inputField">
+      <input type="number" v-model="inputValue" placeholder='Введи от 1 до 10'>
       <button v-on:click="spin">Старт</button>
     </div>
 
@@ -33,18 +33,13 @@ export default {
   data: () => ({
     base: [],
     roulette_items_amount: 200,
-    rotation_duration: 10000,
+    rotation_duration: 3000, // НЕ ЗАБЫТЬ ВЕРНУТЬ НА 10000
     roulette_items: [],
     baseNum: 10,
     inputValue: NaN,
     buttonDisable: false
   }),
   methods: {
-    // Запуск рулетки
-    spin: function() {
-      //this.inputValue = Number(this.inputValue);
-
-    },
     // Функция для автоматического изменения Base на случай если нужно будет делать другой интервал значений
     baseCreate: function() {
       this.base = [...Array(this.baseNum+1).keys()].slice(1);
@@ -58,13 +53,60 @@ export default {
     // Функция для перемешивания массива
     arrayShuffle: function() {
       this.roulette_items.sort(() => Math.random() - 0.5);
-    }
+    },
+    // Запуск рулетки
+    spin: function() {
+
+      let content = document.querySelector(".wheel"),
+  		order = this.base,
+      position = order.indexOf(Number(this.inputValue));
+            
+      // Определение конечной позиции
+      var card = 70 + 4 * 2,
+          landingPosition = (order.length * card) + (position * card);
+
+      console.log('Весь массив ---', order);
+
+      console.log('Позиция до нажатия ---', landingPosition);
+
+        
+      var randomize = Math.floor(Math.random() * 70) - (70/2);
+      //landingPosition = landingPosition + randomize;
+
+      console.log('Позиция цифры ---', position);
+      console.log('Позиция после нажатия ---', landingPosition);
+
+      var object = {
+        x: Math.floor(Math.random() * 50) / 100,
+        y: Math.floor(Math.random() * 20) / 100
+      };
+
+      // Анимация
+      content.style.setProperty(
+        'transition-duration',''+this.rotation_duration+'ms'
+      );
+      content.style.setProperty(
+        'transform','translate3d(-'+landingPosition+'px, 0px, 0px)'
+      );
+      content.style.setProperty(
+        'transition-timing-function','cubic-bezier(0,'+ object.x +','+ object.y + ',1)'
+      );
+
+      // Возврат
+      setTimeout(function(){
+        content.style.setProperty('transition-timing-function','');
+        content.style.setProperty('transition-duration','');
+
+        var resetTo = -(position * card);
+        content.style.setProperty('transform', 'translate3d('+resetTo+'px, 0px, 0px)');
+      }, this.rotation_duration)
+
+    },
   },
   beforeMount() {
     this.baseCreate();
     this.arrayCreate();
-    this.arrayShuffle();
-    this.inputValue = Number(this.inputValue);
+   // this.arrayShuffle();
   },
   // watch: {
   //   'inputValue'(value) {
@@ -80,11 +122,11 @@ export default {
   position:relative;
   display:flex;
   justify-content:center;
-  width:40%;
+  width:80%;
   height: 80px;
   margin:20px auto;
   overflow:hidden;
-  border: 1px solid red;
+  border: 3px solid rgb(48, 233, 202);
 }
 
 .roulette-wrapper .selector{
@@ -103,15 +145,6 @@ export default {
 
 .roulette-wrapper .wheel .row{
   display:flex;
-  /* animation: fadeleft 2s ease infinite alternate; */
-}
-@keyframes fadeleft {
-  0% {
-     transform: translateX(0);
-  }
-  100% {
-     transform: translateX(-20%);
-  }
 }
 
 .roulette-wrapper .wheel .row .card{
@@ -126,6 +159,10 @@ export default {
   font-size:1.5em;
   border: 1px solid yellow;
   background: rgba(0, 0, 0, 0.541);
+}
+
+button {
+  cursor: pointer;
 }
 
 h3 {
