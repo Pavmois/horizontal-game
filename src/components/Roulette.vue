@@ -33,7 +33,7 @@ export default {
   data: () => ({
     base: [],
     roulette_items_amount: 200,
-    rotation_duration: 3000, // НЕ ЗАБЫТЬ ВЕРНУТЬ НА 10000
+    rotation_duration: 10000, // НЕ ЗАБЫТЬ ВЕРНУТЬ НА 10000
     roulette_items: [],
     baseNum: 10,
     inputValue: NaN,
@@ -52,7 +52,7 @@ export default {
     },
     // Функция для перемешивания массива
     arrayShuffle: function() {
-      this.roulette_items.sort(() => Math.random() - 0.5);
+      this.base.sort(() => Math.random() - 0.5);
     },
     // Запуск рулетки
     spin: function() {
@@ -60,21 +60,13 @@ export default {
       let content = document.querySelector(".wheel"),
   		order = this.base,
       position = order.indexOf(Number(this.inputValue));
-            
+             console.log('Массив ---', order);
       // Определение конечной позиции
-      var card = 70 + 4 * 2,
+      var card = 75 + 4 * 2,
           landingPosition = (order.length * card) + (position * card);
-
-      console.log('Весь массив ---', order);
-
-      console.log('Позиция до нажатия ---', landingPosition);
-
         
-      var randomize = Math.floor(Math.random() * 70) - (70/2);
-      //landingPosition = landingPosition + randomize;
-
-      console.log('Позиция цифры ---', position);
-      console.log('Позиция после нажатия ---', landingPosition);
+      var randomize = Math.floor(Math.random() * 75) - (75/2);
+      landingPosition = landingPosition + randomize;
 
       var object = {
         x: Math.floor(Math.random() * 50) / 100,
@@ -97,16 +89,16 @@ export default {
         content.style.setProperty('transition-timing-function','');
         content.style.setProperty('transition-duration','');
 
-        var resetTo = -(position * card);
-        content.style.setProperty('transform', 'translate3d('+resetTo+'px, 0px, 0px)');
-      }, this.rotation_duration)
+        var resetTo = -(position * card + randomize);
+        content.style.setProperty('transform', 'translate3d(0px, 0px, 0px)');
+      }, this.rotation_duration + 1000)
 
     },
   },
   beforeMount() {
     this.baseCreate();
+    this.arrayShuffle();
     this.arrayCreate();
-   // this.arrayShuffle();
   },
   // watch: {
   //   'inputValue'(value) {
