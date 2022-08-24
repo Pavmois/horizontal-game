@@ -6,14 +6,15 @@
       <div class='selector'></div>
       <div class='wheel'>
         <div class="row">
-          <div class="card" v-for="item in roulette_items" :key="item.id">{{item}}</div>
+          <div class="card" v-for="item in roulette_items" :key="item.id">{{ item }}</div>
         </div>
       </div>
     </div>
 
     <div>
       <input type="number" v-model="inputValue" placeholder='Введи от 1 до 10'>
-      <button v-on:click="spin">Старт</button>
+      <button v-on:click="spin" v-show="btnShow1">Старт</button>
+      <button v-on:click="stopSpin" v-show="btnShow2">Старт</button>
     </div>
 
     <h3>
@@ -33,11 +34,12 @@ export default {
   data: () => ({
     base: [],
     roulette_items_amount: 200,
-    rotation_duration: 10000, // НЕ ЗАБЫТЬ ВЕРНУТЬ НА 10000
+    rotation_duration: 10000,
     roulette_items: [],
     baseNum: 10,
     inputValue: NaN,
-    buttonDisable: false
+    btnShow1: true,
+    btnShow2: false
   }),
   methods: {
     // Функция для автоматического изменения Base на случай если нужно будет делать другой интервал значений
@@ -54,21 +56,32 @@ export default {
     arrayShuffle: function() {
       this.base.sort(() => Math.random() - 0.5);
     },
+    // Остановка рулетки и сброс позиции
+    stopSpin: function() {
+      this.btnShow2 = !this.btnShow2;
+      this.btnShow1 = !this.btnShow1;
+
+      let content = document.querySelector(".wheel");
+      content.style.setProperty('transition-timing-function','');
+      content.style.setProperty('transition-duration','');
+      content.style.setProperty('transform', 'translate3d(0px, 0px, 0px)');
+
+    },
     // Запуск рулетки
     spin: function() {
+      this.btnShow1 = !this.btnShow1;
+      this.btnShow2 = !this.btnShow2;
 
       let content = document.querySelector(".wheel"),
   		order = this.base,
       position = order.indexOf(Number(this.inputValue));
-             console.log('Массив ---', order);
-      // Определение конечной позиции
-      var card = 75 + 4 * 2,
-          landingPosition = (order.length * card) + (position * card);
-        
-      var randomize = Math.floor(Math.random() * 75) - (75/2);
-      landingPosition = landingPosition + randomize;
 
-      var object = {
+      // Определение конечной позиции
+      let card = 75 + 4 * 2,
+          landingPosition = (order.length * card) + (position * card);
+      let randomize = Math.floor(Math.random() * 75) - (75/2);
+      landingPosition = landingPosition + randomize;
+      let object = {
         x: Math.floor(Math.random() * 50) / 100,
         y: Math.floor(Math.random() * 20) / 100
       };
@@ -83,28 +96,13 @@ export default {
       content.style.setProperty(
         'transition-timing-function','cubic-bezier(0,'+ object.x +','+ object.y + ',1)'
       );
-
-      // Возврат
-      setTimeout(function(){
-        content.style.setProperty('transition-timing-function','');
-        content.style.setProperty('transition-duration','');
-
-        var resetTo = -(position * card + randomize);
-        content.style.setProperty('transform', 'translate3d(0px, 0px, 0px)');
-      }, this.rotation_duration + 1000)
-
     },
   },
   beforeMount() {
     this.baseCreate();
     this.arrayShuffle();
     this.arrayCreate();
-  },
-  // watch: {
-  //   'inputValue'(value) {
-  //     console.log(value);
-  //   }
-  // }
+  }
 }
 </script>
 
@@ -118,13 +116,14 @@ export default {
   height: 80px;
   margin:20px auto;
   overflow:hidden;
-  border: 3px solid rgb(48, 233, 202);
+  border: 2px solid rgb(225, 0, 255);
+  border-radius: 8px;
 }
 
 .roulette-wrapper .selector{
   width:4px;
   height:100%;
-  background:rgb(0, 255, 76);
+  background:rgb(207, 5, 5);
   left:50%;
   transform:translate(-50%,0%);
   position:absolute;
