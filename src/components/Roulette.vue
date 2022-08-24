@@ -6,24 +6,14 @@
       <div class='selector'></div>
       <div class='wheel'>
         <div class="row">
-          <div class="card">1</div>
-          <div class="card">2</div>
-          <div class="card">3</div>
-          <div class="card">4</div>
-          <div class="card">5</div>
-          <div class="card">6</div>
-          <div class="card">7</div>
-          <div class="card">8</div>
-          <div class="card">9</div>
-          <div class="card">10</div>
-          <div class="card">1</div>
+          <div class="card" v-for="item in base" :key="item.id">{{item}}</div>
         </div>
       </div>
     </div>
 
     <div>
-      <input placeholder='Введи от 1 до 10'>
-      <button>Старт</button>
+      <input type="number" v-model="inputValue" placeholder='Введи от 1 до 10' id="inputField">
+      <button v-on:click="spin">Старт</button>
     </div>
 
     <h3>
@@ -39,7 +29,48 @@ export default {
   name: 'Roulette',
   props: {
     msg: String
-  }
+  },
+  data: () => ({
+    base: [],
+    roulette_items_amount: 200,
+    rotation_duration: 10000,
+    roulette_items: [],
+    baseNum: 10,
+    inputValue: NaN,
+    buttonDisable: false
+  }),
+  methods: {
+    // Запуск рулетки
+    spin: function() {
+      //this.inputValue = Number(this.inputValue);
+
+    },
+    // Функция для автоматического изменения Base на случай если нужно будет делать другой интервал значений
+    baseCreate: function() {
+      this.base = [...Array(this.baseNum+1).keys()].slice(1);
+    },
+    // Функция для автоматической генерации массива с максимальным количеством слотов
+    arrayCreate: function() {
+      for (let i = this.roulette_items.length; this.roulette_items.length != this.roulette_items_amount; i++ ) {
+        this.roulette_items = this.roulette_items.concat(this.base);
+      }
+    },
+    // Функция для перемешивания массива
+    arrayShuffle: function() {
+      this.roulette_items.sort(() => Math.random() - 0.5);
+    }
+  },
+  beforeMount() {
+    this.baseCreate();
+    this.arrayCreate();
+    this.arrayShuffle();
+    this.inputValue = Number(this.inputValue);
+  },
+  // watch: {
+  //   'inputValue'(value) {
+  //     console.log(value);
+  //   }
+  // }
 }
 </script>
 
@@ -72,6 +103,15 @@ export default {
 
 .roulette-wrapper .wheel .row{
   display:flex;
+  /* animation: fadeleft 2s ease infinite alternate; */
+}
+@keyframes fadeleft {
+  0% {
+     transform: translateX(0);
+  }
+  100% {
+     transform: translateX(-20%);
+  }
 }
 
 .roulette-wrapper .wheel .row .card{
